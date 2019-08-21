@@ -50,7 +50,7 @@ async def get_data():
 
 #--------------------Сохранение данных-------------------------
 async def save_data():
-    t0=time.time()
+
     sql = "SELECT * FROM users "
     cursor.execute(sql)
     data = cursor.fetchall()  # or use fetchone()
@@ -58,13 +58,12 @@ async def save_data():
         # Переводим словарь в строку
         str_data=json.dumps(data)
 
-        # Обноваляем наш файл с данными
+        # Обновляем  наш файл с данными
         await bot.edit_message_media(InputMediaDocument(io.StringIO(str_data)), admin_id, config_id)
 
     except Exception as ex:
         print(ex)
-    print('i save')
-    print( time.time()-t0)
+
 
 #--------------------Метод при нажатии start-------------------------
 @dp.message_handler(commands='start')
@@ -104,7 +103,7 @@ async def start(message: types.Message):
 @dp.message_handler()
 async def main_logic(message: types.Message):
 
-    t0=time.time()
+
 # Логика для администратора
     if message.text == 'admin':
         cursor.execute("CREATE TABLE users (chatid INTEGER , name TEXT, click INTEGER, state INTEGER)")
@@ -120,7 +119,6 @@ async def main_logic(message: types.Message):
 
 
 # Логика для пользователя
-# Получаем данные от телеграма
     try:
         sql = "SELECT * FROM users where chatid={}".format(message.chat.id)
         cursor.execute(sql)
@@ -144,7 +142,7 @@ async def main_logic(message: types.Message):
             await bot.send_message(message.chat.id, 'Кликов: {} 🏆'.format(data[2]+1))
 
 
-        # При нажатии кнопки Рейтинг выводим пользоваителю топ 10
+        # При нажатии кнопки Рейтинг выводим пользователю топ 10
         if message.text == 'Рейтинг':
             sql = "SELECT * FROM users ORDER BY click DESC LIMIT 15"
             cursor.execute(sql)
@@ -160,9 +158,9 @@ async def main_logic(message: types.Message):
             await bot.send_message(message.chat.id, rating)
 
     else:
-        await bot.send_message(message.chat.id, 'Вы не разерстрирвоаны')
+        await bot.send_message(message.chat.id, 'Вы не зарегистрированы')
 
-    print( time.time()-t0)
+
 
 
 
