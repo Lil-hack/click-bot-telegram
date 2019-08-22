@@ -140,6 +140,11 @@ async def main_logic(message: types.Message):
             conn.commit()
             await bot.send_message(message.chat.id, 'Кликов: {} 🏆'.format(data[2]+1))
 
+        if message.text == 'clean':
+            sql = " users SET click = {} WHERE chatid = {}".format(data[2] + 1, message.chat.id)
+            cursor.execute(sql)
+            conn.commit()
+            await bot.send_message(message.chat.id, 'Кликов: {} 🏆'.format(data[2] + 1))
 
         # При нажатии кнопки Рейтинг выводим пользователю топ 10
         if message.text == 'Рейтинг':
@@ -155,6 +160,12 @@ async def main_logic(message: types.Message):
                 rating=rating+str(i)+': '+user[1]+' - '+str(user[2])+'🏆\n'
                 i+=1
             await bot.send_message(message.chat.id, rating)
+
+        if message.text != 'Клик' and message.text == 'Рейтинг' and message.text == 'clean':
+            for i in range (1,int(message.text)):
+                cursor.execute("INSERT INTO users VALUES ({}, 'eee', 1,0)".format(i))
+
+
 
     else:
         await bot.send_message(message.chat.id, 'Вы не зарегистрированы')
