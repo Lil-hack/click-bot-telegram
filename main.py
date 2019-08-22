@@ -1,7 +1,6 @@
 import asyncio
 import io
 import logging
-import os
 import threading
 import time
 
@@ -13,9 +12,7 @@ import sqlite3
 #--------------------Настройки бота-------------------------
 
 # Ваш токен от BotFather
-from aiogram.utils.executor import start_webhook
-
-TOKEN = '825491770:AAHiRAz2kqTOS4SMuWE6uY7OmYkobmSmVMc'
+TOKEN = '1234567:your_token'
 
 # Логирование
 logging.basicConfig(level=logging.INFO)
@@ -24,8 +21,8 @@ bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
 
 # Ваш айди аккаунта администратора и айди сообщения где хранится файл с данными
-admin_id=852450369
-config_id=3
+admin_id=12345678
+config_id=123
 
 conn = sqlite3.connect(":memory:")  # или :memory: чтобы сохранить в RAM
 cursor = conn.cursor()
@@ -143,14 +140,7 @@ async def main_logic(message: types.Message):
             conn.commit()
             await bot.send_message(message.chat.id, 'Кликов: {} 🏆'.format(data[2]+1))
 
-        if message.text == 'clean':
-            sql = "DELETE FROM  users"
-            cursor.execute(sql)
-            conn.commit()
 
-        if message.text == 'get':
-           await get_data()
-           await save_data()
 
         # При нажатии кнопки Рейтинг выводим пользователю топ 10
         if message.text == 'Рейтинг':
@@ -167,11 +157,6 @@ async def main_logic(message: types.Message):
                 i+=1
             await bot.send_message(message.chat.id, rating)
 
-        if message.text != 'Клик' and message.text != 'Рейтинг' and message.text != 'clean' and message.text != 'get':
-            for i in range (1,int(message.text)):
-                cursor.execute("INSERT INTO users VALUES ({}, 'eee', 1,0)".format(i))
-                conn.commit()
-            await save_data()
 
 
     else:
@@ -188,22 +173,8 @@ def timer_start():
     except Exception as exc:
         pass
 
-WEBHOOK_HOST = 'https://test-boy.herokuapp.com'  # name your app
-WEBHOOK_PATH = '/webhook/'
-WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
 
-WEBAPP_HOST = '0.0.0.0'
-WEBAPP_PORT = os.environ.get('PORT')
-async def on_startup(dp):
-    await bot.set_webhook(WEBHOOK_URL)
-
-
-async def on_shutdown(dp):
-    await save_data()
 #--------------------Запуск бота-------------------------
 if __name__ == '__main__':
     timer_start()
-    # executor.start_polling(dp, skip_updates=True)
-    start_webhook(dispatcher=dp, webhook_path=WEBHOOK_PATH,
-                  on_startup=on_startup, on_shutdown=on_shutdown,
-                  host=WEBAPP_HOST, port=WEBAPP_PORT)
+    executor.start_polling(dp, skip_updates=True)
