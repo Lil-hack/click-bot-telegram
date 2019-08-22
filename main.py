@@ -1,6 +1,7 @@
 import asyncio
 import io
 import logging
+import os
 import threading
 import time
 
@@ -12,6 +13,8 @@ import sqlite3
 #--------------------Настройки бота-------------------------
 
 # Ваш токен от BotFather
+from aiogram.utils.executor import start_webhook
+
 TOKEN = '825491770:AAHiRAz2kqTOS4SMuWE6uY7OmYkobmSmVMc'
 
 # Логирование
@@ -185,7 +188,22 @@ def timer_start():
     except Exception as exc:
         pass
 
+WEBHOOK_HOST = 'https://test-boy.herokuapp.com'  # name your app
+WEBHOOK_PATH = '/webhook/'
+WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
+
+WEBAPP_HOST = '0.0.0.0'
+WEBAPP_PORT = os.environ.get('PORT')
+async def on_startup(dp):
+    await bot.set_webhook(WEBHOOK_URL)
+
+
+async def on_shutdown(dp):
+    await save_data()
 #--------------------Запуск бота-------------------------
 if __name__ == '__main__':
     timer_start()
-    executor.start_polling(dp, skip_updates=True)
+    # executor.start_polling(dp, skip_updates=True)
+    start_webhook(dispatcher=dp, webhook_path=WEBHOOK_PATH,
+                  on_startup=on_startup, on_shutdown=on_shutdown,
+                  host=WEBAPP_HOST, port=WEBAPP_PORT)
