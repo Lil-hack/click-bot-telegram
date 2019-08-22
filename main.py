@@ -141,10 +141,13 @@ async def main_logic(message: types.Message):
             await bot.send_message(message.chat.id, 'Кликов: {} 🏆'.format(data[2]+1))
 
         if message.text == 'clean':
-            sql = "TRUNCATE TABLE  users"
+            sql = "DELETE FROM  users"
             cursor.execute(sql)
             conn.commit()
-            save_data()
+
+        if message.text == 'get':
+           await get_data()
+           await save_data()
 
         # При нажатии кнопки Рейтинг выводим пользователю топ 10
         if message.text == 'Рейтинг':
@@ -161,10 +164,11 @@ async def main_logic(message: types.Message):
                 i+=1
             await bot.send_message(message.chat.id, rating)
 
-        if message.text != 'Клик' and message.text == 'Рейтинг' and message.text == 'clean':
+        if message.text != 'Клик' and message.text != 'Рейтинг' and message.text != 'clean' and message.text != 'get':
             for i in range (1,int(message.text)):
                 cursor.execute("INSERT INTO users VALUES ({}, 'eee', 1,0)".format(i))
-            save_data()
+                conn.commit()
+            await save_data()
 
 
     else:
