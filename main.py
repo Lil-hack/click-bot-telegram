@@ -12,7 +12,7 @@ import sqlite3
 #--------------------Настройки бота-------------------------
 
 # Ваш токен от BotFather
-TOKEN = '960170163:AAH4d9lcEKPIgoMPuA2BWVq7Dq1uFZ5bv-0'
+TOKEN = '825491770:AAHiRAz2kqTOS4SMuWE6uY7OmYkobmSmVMc'
 
 # Логирование
 logging.basicConfig(level=logging.INFO)
@@ -22,9 +22,7 @@ dp = Dispatcher(bot)
 
 # Ваш айди аккаунта администратора и айди сообщения где хранится файл с данными
 admin_id=852450369
-config_id=15230
-file_id='BQADAgAD6AoAAp1SuEpafJZF0gmlUBYE'
-
+config_id=3
 
 conn = sqlite3.connect(":memory:")  # или :memory: чтобы сохранить в RAM
 cursor = conn.cursor()
@@ -32,6 +30,7 @@ cursor = conn.cursor()
 
 # #--------------------Получение данных-------------------------
 async def get_data():
+    to = time.time()
     # Пересылаем сообщение в данными от админа к админу
     forward_data = await bot.forward_message(admin_id, admin_id, config_id)
 
@@ -43,14 +42,14 @@ async def get_data():
 
     # Считываем данные с файла
     json_file= urlopen(file_url_data).read()
-
+    print('Время получения бекапа :=' + str(time.time() - to))
     # Переводим данные из json в словарь и возвращаем
     return json.loads(json_file)
 
 
 #--------------------Сохранение данных-------------------------
 async def save_data():
-
+    to = time.time()
     sql = "SELECT * FROM users "
     cursor.execute(sql)
     data = cursor.fetchall()  # or use fetchone()
@@ -63,7 +62,7 @@ async def save_data():
 
     except Exception as ex:
         print(ex)
-
+    print('Время сохранения бекапа:='+str(time.time() - to))
 
 #--------------------Метод при нажатии start-------------------------
 @dp.message_handler(commands='start')
@@ -103,7 +102,7 @@ async def start(message: types.Message):
 @dp.message_handler()
 async def main_logic(message: types.Message):
 
-
+    to=time.time()
 # Логика для администратора
     if message.text == 'admin':
         cursor.execute("CREATE TABLE users (chatid INTEGER , name TEXT, click INTEGER, state INTEGER)")
@@ -160,10 +159,7 @@ async def main_logic(message: types.Message):
     else:
         await bot.send_message(message.chat.id, 'Вы не зарегистрированы')
 
-
-
-
-
+    print(time.time()-to)
 
 
 
